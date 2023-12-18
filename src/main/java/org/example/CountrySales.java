@@ -5,10 +5,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.persistence.*;
@@ -47,7 +45,7 @@ public class CountrySales extends JFrame {
         SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Country.class)
-                .addAnnotatedClass(Sales.class)
+                .addAnnotatedClass(Sale.class)
                 .buildSessionFactory();
         Session session = null;
         try {
@@ -73,10 +71,10 @@ public class CountrySales extends JFrame {
                     country = new Country(strings[0], countryName);
                     existingCountries.add(countryName);
                 }
-                Sales sales = new Sales(strings[2], strings[3], strings[4], convertDate(strings[5]),
+                Sale sale = new Sale(strings[2], strings[3], strings[4], convertDate(strings[5]),
                         Integer.parseInt(strings[6]), Float.parseFloat(strings[7]), country);
                 session.save(country);
-                session.save(sales);
+                session.save(sale);
             }
             session.getTransaction().commit();
         } catch (IOException e) {
@@ -89,13 +87,13 @@ public class CountrySales extends JFrame {
         SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Country.class)
-                .addAnnotatedClass(Sales.class)
+                .addAnnotatedClass(Sale.class)
                 .buildSessionFactory();
         Session session = null;
         try {
             session = factory.openSession();
             List<Object[]> results = session.createQuery("select c.region, sum(s.unitsSold) as totalQuantity " +
-                            "from Sales s " +
+                            "from Sale s " +
                             "join s.country c " +
                             "group by c.region " +
                             "order by totalQuantity desc", Object[].class)
@@ -127,13 +125,13 @@ public class CountrySales extends JFrame {
         SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Country.class)
-                .addAnnotatedClass(Sales.class)
+                .addAnnotatedClass(Sale.class)
                 .buildSessionFactory();
         Session session = null;
         try {
             session = factory.openSession();
             List<Object[]> results = session.createQuery("select c.countryName, max(s.totalProfit) as maxIncome " +
-                            "from Sales s " +
+                            "from Sale s " +
                             "join s.country c " +
                             "where c.region in ('Europe', 'Asia') " +
                             "group by c.countryName " +
@@ -155,14 +153,14 @@ public class CountrySales extends JFrame {
         SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Country.class)
-                .addAnnotatedClass(Sales.class)
+                .addAnnotatedClass(Sale.class)
                 .buildSessionFactory();
         Session session = null;
         try {
             session = factory.openSession();
             List<Object[]> results = session.createQuery(
                             "select c.countryName, max(s.totalProfit) as totalIncome " +
-                                    "from Sales s " +
+                                    "from Sale s " +
                                     "join s.country c " +
                                     "where c.region in ('Middle East and North Africa', 'Sub-Saharan Africa') and s.totalProfit > 42000 and s.totalProfit < 44000 " +
                                     "group by c.countryName " +
